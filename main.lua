@@ -1,9 +1,15 @@
 Timer  = require 'hump.timer'
 GS     = require 'hump.gamestate'
+camera = require 'hump.camera'
+vector = require 'hump.vector'
 require 'slam'
 
+function triangle_osc(t)
+	return 2 * math.abs(2*((t+.25)%1) - 1) - 1
+end
+
 function GS.transition(to, length, ...)
-	length = length or 2
+	length = length or 1
 
 	local fade_color, t = {7,5,8,0}, 0
 	local draw, update, switch, transition = GS.draw, GS.update, GS.switch, GS.transition
@@ -47,7 +53,7 @@ local function Proxy(f)
 end
 
 State = Proxy(function(path) return require('states.' .. path) end)
-Images = Proxy(function(path)
+Image = Proxy(function(path)
 	local i = love.graphics.newImage('img/'..path..'.png')
 	i:setFilter('nearest', 'nearest')
 	return i
@@ -65,15 +71,17 @@ Sound = {
 Entities = Proxy(function(path) return require('entities.' .. path) end)
 
 function love.load()
-	WIDTH, HEIGHT = love.graphics.getWidth(), love.graphics.getHeight()
-	foes_remaining = 10
+	WIDTH, HEIGHT = love.window.getWidth(), love.window.getHeight()
 
 	GS.registerEvents()
 	-- RELEASE
-	GS.switch(State.splash)
+	--GS.switch(State.splash)
 
 	-- TEST
 	--GS.switch(State.menu)
+	--GS.switch(State.socool)
+	GS.switch(State.summersault)
+	--GS.switch(State.beer)
 end
 
 function love.update(dt)
@@ -83,11 +91,5 @@ end
 function love.keypressed(key)
 	if (key == 'escape' or key == 'p') and GS.current() ~= State.pause then
 		GS.push(State.pause)
-	end
-end
-
-function love.mousepressed()
-	if GS.current() ~= State.bribing then
-		GS.keypressed('mouse', 0)
 	end
 end

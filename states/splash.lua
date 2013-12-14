@@ -25,8 +25,8 @@ local offset = {
 	y = (love.graphics.getHeight() - #board   * (cell_spacing + cell_height)) / 2,
 }
 local haze = {
-	sx  = love.graphics.getWidth() / Images.haze:getWidth(),
-	sy  = love.graphics.getHeight() / Images.haze:getHeight(),
+	sx  = love.graphics.getWidth() / Image.haze:getWidth(),
+	sy  = love.graphics.getHeight() / Image.haze:getHeight(),
 }
 
 -- SOUND
@@ -50,7 +50,7 @@ end
 
 local t = 0
 function st:init()
-	Images.haze:setFilter('linear', 'linear')
+	Image.haze:setFilter('linear', 'linear')
 end
 
 function st:enter()
@@ -79,7 +79,7 @@ end
 
 function st:draw()
 	love.graphics.setColor(100,100,100)
-	love.graphics.draw(Images.gradient, 0,0)
+	love.graphics.draw(Image.gradient, 0,0)
 	for i = 1,#board do
 		local y = offset.y + (i-1) * (cell_height + cell_spacing)
 		for k = 1,#board[1] do
@@ -94,7 +94,7 @@ function st:draw()
 
 	if t >= duration_show_splash then
 		love.graphics.setColor(color_bg)
-		love.graphics.draw(Images.haze, love.graphics.getWidth(),0,0, -haze.sx * math.sqrt(s) * 2, haze.sy * math.sqrt(s) * 5)
+		love.graphics.draw(Image.haze, love.graphics.getWidth(),0,0, -haze.sx * math.sqrt(s) * 2, haze.sy * math.sqrt(s) * 5)
 	end
 end
 
