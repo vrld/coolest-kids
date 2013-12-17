@@ -33,20 +33,21 @@ function st:init()
 	Image.clouds:setWrap('repeat', 'repeat')
 end
 
-local may_jump, flying, player, blood, won, lost, show_skip
+local timer, cam, may_jump, flying, player, blood, won, lost, show_skip
 function st:enter(prev)
-	self.timer = Timer.new()
+	timer = Timer.new()
 	cam = camera()
 	cam:move(200, height.top + height.middle*2 + height.bottom - HEIGHT)
 
 	may_jump, flying = false, false
 	if prev ~= st then
-		self.timer:tween(5, cam, {y = 0}, 'in-out-quint', function()
+		timer:tween(5, cam, {y = 0}, 'in-out-quint', function()
 			may_jump = true
 		end)
 	else
+		Sound.static.woosh:play()
 		show_skip = true
-		self.timer:tween(.5, cam, {y = 0}, 'in-out-quint', function()
+		timer:tween(.5, cam, {y = 0}, 'in-out-quint', function()
 			may_jump = true
 		end)
 	end
@@ -57,7 +58,7 @@ function st:enter(prev)
 
 	player = {x = WIDTH-103, y = -20, rot = 0, rotvel = 0}
 
-	love.graphics.setFont(Font[20])
+	love.graphics.setFont(Font[30])
 
 	blood = {sb = love.graphics.newSpriteBatch(Image.blood, 512)}
 	for i = 1,512 do
@@ -92,7 +93,7 @@ function st:draw()
 
 	love.graphics.draw(Image.jump, anim.current[anim.frame], player.x, player.y, player.rot, 2,2, 16,16)
 	if may_jump then
-		love.graphics.print('[space] to jump', WIDTH-180,-120)
+		love.graphics.print('[space]', WIDTH-180,-120)
 	end
 
 	for str,m in pairs(messages) do
@@ -153,19 +154,30 @@ function st:update(dt)
 		player.rot = player.rot + player.rotvel * dt
 	end
 
-	self.timer:update(dt)
+	timer:update(dt)
 end
 
 function st:keypressed(key)
 	if may_jump and key == ' ' then
+		Sound.static.wind:play()
+		Sound.static.wind:setPitch(1.2)
+		local woosh = Sound.static.woosh:play()
+		woosh:setPitch(.4)
 		may_jump = false
-		say('GERONIMO!!', 10, -50)
-		say('[a] [d] or [left] [right] to rotate', -20, -80, 255,255,255)
+		say('[arrows] [a] [d]', -80, -80, 255,255,255)
 		anim.current = anim.jump
-		self.timer:tween(2.8, player, {x = player.x - 280}, 'out-quad')
-		self.timer:tween(.3, player, {y = player.y - 20}, 'in-out-quad', function()
+		timer:tween(2.8, player, {x = player.x - 280}, 'out-quad')
+		timer:tween(.3, player, {y = player.y - 20}, 'in-out-quad', function()
 			anim.current, anim.frame, flying = anim.fly, 1, true
-			self.timer:tween(2.5, player, {y = height.top+height.middle*2+height.bottom-32}, 'quad', function()
+			--timer:add(2.3, function()
+			--	Sound.static.land:play()
+			--	local rot = (player.rot - math.pi/2) % (2 * math.pi)
+			--	if math.abs(player.rotvel) >= 3 or (rot >= .35 and rot <= 2*math.pi-.35) then
+			--		Sound.static.splatter:play()
+			--	end
+			--end)
+			timer:tween(2.5, player, {y = height.top+height.middle*2+height.bottom-32}, 'quad', function()
+				Sound.static.land:play()
 				anim.current, anim.frame, flying = anim.land, 1, false
 				if math.abs(player.rot) > 4 then
 					won = true
@@ -173,19 +185,19 @@ function st:keypressed(key)
 				player.rot = player.rot - math.pi/2
 				player.rot = player.rot % (2 * math.pi)
 
-				if player.rot < .3 or player.rot > 2*math.pi-.3 then
+				if math.abs(player.rotvel) < 3 and (player.rot < .3 or player.rot > 2*math.pi-.3) then
 					player.rot = 0
 				else
+					Sound.static.splatter:play()
 					player.rot = math.pi/2 * (-player.rot / math.abs(player.rot))
-					say('SPLOSH', -20,-50)
 					blood.splash = true
-					self.timer:tween(.1, player, {y = player.y + 30})
+					timer:tween(.1, player, {y = player.y + 30})
 					won = false
 				end
 
 				if won then
-					say('TADAA', -20, -50)
-					self.timer:add(3, function() GS.transition(State.socool) end)
+					timer:add(.3, function() Sound.static.tadaaa:play() end)
+					timer:add(2.5, function() GS.transition(State.socool) end)
 				end
 				lost = not won
 			end)

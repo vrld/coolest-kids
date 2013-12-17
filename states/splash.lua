@@ -2,8 +2,8 @@ local st = {}
 
 local base = (...):gsub('%.', '/') .. '/'
 local duration_show_splash = 1 -- in seconds
-local color_fg     = {226,184,104}
-local color_bg     = {72,53,89}
+local color_fg     = {153,255,0}
+local color_bg     = {72,22,11}
 local cell_width   = 20
 local cell_height  = 20
 local cell_spacing = 3
@@ -78,8 +78,8 @@ function st:enter()
 end
 
 function st:draw()
-	love.graphics.setColor(100,100,100)
-	love.graphics.draw(Image.gradient, 0,0)
+	love.graphics.setColor(255,255,255)
+	love.graphics.draw(Image.background)
 	for i = 1,#board do
 		local y = offset.y + (i-1) * (cell_height + cell_spacing)
 		for k = 1,#board[1] do

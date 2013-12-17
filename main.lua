@@ -60,7 +60,7 @@ Image = Proxy(function(path)
 end)
 Font  = Proxy(function(arg)
 	if tonumber(arg) then
-		return love.graphics.newFont(arg)
+		return love.graphics.newFont('font/slkscr.ttf', arg)
 	end
 	return Proxy(function(size) return love.graphics.newFont('font/'..arg..'.ttf', size) end)
 end)
@@ -75,12 +75,13 @@ function love.load()
 
 	GS.registerEvents()
 	-- RELEASE
-	--GS.switch(State.splash)
+	GS.switch(State.splash)
 
 	-- TEST
 	--GS.switch(State.menu)
 	--GS.switch(State.socool)
-	GS.switch(State.summersault)
+	--GS.switch(State.summersault)
+	--GS.switch(State.trousers)
 	--GS.switch(State.beer)
 end
 
